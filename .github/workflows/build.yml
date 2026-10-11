@@ -1,0 +1,19 @@
+name: Build EXE
+on: [workflow_dispatch, push]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - shell: pwsh
+        run: |
+          pip install customtkinter pillow mss pyautogui pynput img2pdf pyinstaller
+          $ctk = python -c "import customtkinter,os;print(os.path.dirname(customtkinter.__file__))"
+          pyinstaller --onefile --noconsole --uac-admin --name ZKitapPDF --add-data "$ctk;customtkinter/" zkitap_pdf.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ZKitapPDF
+          path: dist/ZKitapPDF.exe
